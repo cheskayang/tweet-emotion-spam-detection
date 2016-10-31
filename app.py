@@ -4,24 +4,41 @@ import re
 import urllib2
 import codecs
 
+whiteList = ["twitter.com", "instagram.com", "telegraph.co.uk", "sky.com", "apple.news", "statnews.com"]
+shortList = ["//t.co/", "//ow.ly/", "//goo.gl/", "//lnkd.in/", "//ift.tt/"]
+
 # Use to unwrap a shortened URL
 class HeadRequest(urllib2.Request):
     def get_method(self):
         return "HEAD"
+
+def isExemption(url):
+    if url.find('/news/') == -1 and url.find('/articles/') == -1:
+        for white in whiteList:
+            if url.find(white) != -1:
+                return True
+        return False
+    else:
+        return True
+
+def isShortURL(url):
+    for short in shortList:
+        if url.find(short) != -1:
+            return True
 
 # Check if any external url exists in a tweet
 def hasExternalURL(tweet):
     bFound = False;
     urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', tweet)
     for url in urls:
-        if url.find('https://t.co/') != -1:
+        if isShortURL(url):
             try:
                 res = urllib2.urlopen(HeadRequest(url))
-                bFound = (res.geturl().find('twitter.com') == -1)
+                bFound = not isExemption(res.geturl()) #(res.geturl().find('twitter.com') == -1)
             except:
                 bFound = True
         else:
-            bFound = (url.find('twitter.com') == -1)
+            bFound = not isExemption(url) #(url.find('twitter.com') == -1)
             
     return bFound
 
@@ -46,18 +63,14 @@ def checkSpam(tweet):
             score = 0.60
     else:
         if numOfHashtags > 2:
-            score = 0.40 + ((numOfHashtags - 3) / numOfHashtags * 0.60)
+            score = 0.30 + ((numOfHashtags - 3) / numOfHashtags * 0.70)
             
     return score #(score > 0.60)
 
-infile = codecs.open("sample.csv", "r", "utf_8")
+infile = codecs.open("sample_0.csv", "r", "utf_8")
 tweets_raw = infile.readlines()
 for tweet in tweets_raw:
     tweet = tweet[:-4]
-    print checkSpam(tweet)
+    print checkSpam(tweet), tweet
     
-# tweets_data = csv.reader(infile)
-# for idx, row in enumerate(tweets_data):
-#     print idx
-
 # print checkSpam("start being excited about what could go right. #life #happy #quotes #inspiration #motivation #love #win #sad #quote https://t.co/yUheMRi1yr")
