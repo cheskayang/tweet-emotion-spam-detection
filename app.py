@@ -3,6 +3,7 @@
 import re
 import urllib2
 import codecs
+import csv
 
 whiteList = ["twitter.com", "instagram.com", "telegraph.co.uk", "sky.com", "apple.news", "statnews.com"]
 shortList = ["//t.co/", "//ow.ly/", "//goo.gl/", "//lnkd.in/", "//ift.tt/"]
@@ -27,7 +28,7 @@ def isShortURL(url):
             return True
 
 # Check if any external url exists in a tweet
-def hasExternalURL(tweet):
+def hasSuspectExternalURL(tweet):
     bFound = False;
     urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', tweet)
     for url in urls:
@@ -54,7 +55,7 @@ def getNumberOfHashtags(tweet):
 def checkSpam(tweet):
     score = 0.00
     numOfHashtags = float(getNumberOfHashtags(tweet))
-    bHasExternalURL = hasExternalURL(tweet)
+    bHasExternalURL = hasSuspectExternalURL(tweet)
     # print bHasExternalURL, numOfHashtags
     if bHasExternalURL:
         if numOfHashtags > 0:
@@ -67,10 +68,21 @@ def checkSpam(tweet):
             
     return score #(score > 0.60)
 
-infile = codecs.open("sample_0.csv", "r", "utf_8")
-tweets_raw = infile.readlines()
-for tweet in tweets_raw:
-    tweet = tweet[:-4]
-    print checkSpam(tweet), tweet
+# Test the algorithm
+with open('sample_0.csv', 'rb') as f:
+    SPAM_THRESHOLD_SCORE = 0.55
+    reader = csv.reader(f, delimiter=',')
+    spam_counter = 0
+    is_Spam = False
+    for i, row in enumerate(reader):
+        is_Spam = (checkSpam(row[0]) > SPAM_THRESHOLD_SCORE)
+        print str(i) + '\t' + str(is_Spam) + '\t' + row[0]
+        if is_Spam:
+            spam_counter += 1
+    print str(float(spam_counter) / (i + 1) * 100) + '% accuracy'
     
-# print checkSpam("start being excited about what could go right. #life #happy #quotes #inspiration #motivation #love #win #sad #quote https://t.co/yUheMRi1yr")
+# infile = codecs.open("sample_0.csv", "r", "utf_8")
+# tweets_raw = infile.readlines()
+# for tweet in tweets_raw:
+#     tweet = tweet[:-4]
+#     print checkSpam(tweet), tweet
