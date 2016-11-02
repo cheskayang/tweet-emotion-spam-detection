@@ -20,11 +20,11 @@ allWords = []
 for tweet in allTweetContent:
     allWords += tknzr.tokenize(tweet)
 
-# extract top 3000 words and assign to allFeatures
+# extract top 3000 words and assign to a list
 allWords = nltk.FreqDist(allWords)
 wordFeatures = list(allWords.keys()[:3000])
 
-# a feature extractor which checks whether each of these words is present in a given document.
+# feature extractor which checks whether each of these words is present in a given document.
 def findFeatures(document):
     words = set(document)
     features = {}
