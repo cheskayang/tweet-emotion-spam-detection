@@ -5,7 +5,7 @@ import urllib2
 import codecs
 import csv
 
-whiteList = ["twitter.com", "instagram.com", "telegraph.co.uk", "sky.com", "apple.news", "statnews.com"]
+whiteList = ["twitter.com", "instagram.com", "telegraph.co.uk", "sky.com", "apple.news", "statnews.com", ".org"]
 shortList = ["//t.co/", "//ow.ly/", "//goo.gl/", "//lnkd.in/", "//ift.tt/", "//bit.ly/"]
 
 # Use to unwrap a shortened URL
@@ -70,13 +70,15 @@ def checkSpam(tweet):
 
 # Test the algorithm
 with open('sample_0.csv', 'rb') as f:
-    SPAM_THRESHOLD_SCORE = 0.55
+    SPAM_THRESHOLD_SCORE = 0.60
     reader = csv.reader(f, delimiter=',')
     spam_counter = 0
     is_Spam = False
+    score = 0.0
     for i, row in enumerate(reader):
-        is_Spam = (checkSpam(row[0]) > SPAM_THRESHOLD_SCORE)
-        print str(i) + '\t' + str(is_Spam) + '\t' + row[0]
+        score = checkSpam(row[0])
+        is_Spam = (checkSpam(row[0]) >= SPAM_THRESHOLD_SCORE)
+        print str(i) + '\t' + str(score) + '\t' + row[0]
         if is_Spam:
             spam_counter += 1
     print str(float(spam_counter) / (i + 1) * 100) + '% detected.'
