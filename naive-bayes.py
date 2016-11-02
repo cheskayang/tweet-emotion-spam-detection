@@ -22,17 +22,18 @@ for tweet in allTweetContent:
 
 # extract top 3000 words and assign to allFeatures
 allWords = nltk.FreqDist(allWords)
-allFeatures = list(allWords.keys()[:3000])
+wordFeatures = list(allWords.keys()[:3000])
 
 # a feature extractor which checks whether each of these words is present in a given document.
 def findFeatures(document):
     words = set(document)
     features = {}
-    for w in allFeatures:
+    for w in wordFeatures:
         features[w] = (w in words)
 
     return features
 featuresets = [(findFeatures(doc), code) for (doc, code) in documents]
+
 
 # assign part featuresets to training_set and part to test_set
 training_set = featuresets[:800]
