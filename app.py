@@ -6,7 +6,7 @@ import codecs
 import csv
 
 whiteList = ["twitter.com", "instagram.com", "telegraph.co.uk", "sky.com", "apple.news", "statnews.com"]
-shortList = ["//t.co/", "//ow.ly/", "//goo.gl/", "//lnkd.in/", "//ift.tt/"]
+shortList = ["//t.co/", "//ow.ly/", "//goo.gl/", "//lnkd.in/", "//ift.tt/", "//bit.ly/"]
 
 # Use to unwrap a shortened URL
 class HeadRequest(urllib2.Request):
@@ -79,7 +79,7 @@ with open('sample_0.csv', 'rb') as f:
         print str(i) + '\t' + str(is_Spam) + '\t' + row[0]
         if is_Spam:
             spam_counter += 1
-    print str(float(spam_counter) / (i + 1) * 100) + '% accuracy'
+    print str(float(spam_counter) / (i + 1) * 100) + '% detected.'
     
 # infile = codecs.open("sample_0.csv", "r", "utf_8")
 # tweets_raw = infile.readlines()
