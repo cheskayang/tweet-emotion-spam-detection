@@ -32,20 +32,22 @@ def findFeatures(document):
         features[w] = (w in words)
 
     return features
+
 featuresets = [(findFeatures(doc), code) for (doc, code) in documents]
 
-
-# assign part featuresets to training_set and part to test_set
-training_set = featuresets[:800]
-testing_set = featuresets[800:]
-
-# use training_set to train a naive Bayes classifier.
-classifier = nltk.NaiveBayesClassifier.train(training_set)
-
-# print classifier accuracy
-print("Classifier accuracy percent:", (nltk.classify.accuracy(classifier, testing_set))*100)
-
-# show top 100 features
-classifier.show_most_informative_features(100)
+print featuresets[0]
+#
+# # assign part featuresets to training_set and part to test_set
+# training_set = featuresets[:800]
+# testing_set = featuresets[800:]
+#
+# # use training_set to train a naive Bayes classifier.
+# classifier = nltk.NaiveBayesClassifier.train(training_set)
+#
+# # print classifier accuracy
+# print("Classifier accuracy percent:", (nltk.classify.accuracy(classifier, testing_set))*100)
+#
+# # show top 100 features
+# classifier.show_most_informative_features(100)
 
 
