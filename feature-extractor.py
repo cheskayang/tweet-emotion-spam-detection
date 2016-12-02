@@ -37,15 +37,15 @@ def findFeatures(document):
 
 featuresets = [(findFeatures(doc), code) for (doc, code) in documents]
 
-
+# print featuresets[0]
 
 # # featuresets = [(findFeatures("#happy #anger had a very bad day!!"), "0")]
 #
 # print featuresets
 
 # assign part featuresets to training_set and part to test_set
-training_set = featuresets[:800]
-testing_set = featuresets[800:]
+training_set = featuresets[:1000]
+testing_set = featuresets[1000:]
 
 # use training_set to train a naive Bayes classifier.
 classifier = nltk.NaiveBayesClassifier.train(training_set)
