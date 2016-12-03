@@ -20,7 +20,9 @@ def findFeatures(document):
     for word in singleTweetWords:
         if word.startswith("#"):
             counter += 1
-    if counter < 2:
+    if counter == 0:
+        features["numberOfHashtag"] = "0"
+    elif counter > 0 and counter < 2:
         features["numberOfHashtag"] = "<2"
     elif counter == 2:
         features["numberOfHashtag"] = "2"
@@ -32,6 +34,11 @@ def findFeatures(document):
         features["numberOfHashtag"] = "5"
     elif counter > 5:
         features["numberOfHashtag"] = ">5"
+
+    if document[0] == "#":
+        features["hashtag-position"] = "f-start-hashtag"
+    if document.split()[-1][0] == "#":
+        features["hashtag-position"] = "f-end-hashtag"
 
     return features
 
@@ -54,6 +61,6 @@ classifier = nltk.NaiveBayesClassifier.train(training_set)
 print("Classifier accuracy percent:", (nltk.classify.accuracy(classifier, testing_set))*100)
 
 # show top 100 features
-classifier.show_most_informative_features(5)
+classifier.show_most_informative_features(10)
 
 
