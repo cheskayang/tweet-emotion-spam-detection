@@ -1,4 +1,5 @@
 import re
+from url_classifier import getURLType
 
 testData = ["CHECK IT OUT http://ebay.to/1E668IW #Anger Inside Out Small #Figure #sales #InsideOut #ebay #shopping",
             "@realDonaldTrump good you racist pig #angry as hell @Blackman",
@@ -33,8 +34,9 @@ def removeHashtag(tweet):
     return tweet
 
 def replaceUrl(tweet):
-    tweet = re.sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', 'url', tweet)
-
+    urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', tweet)
+    for url in urls:
+        tweet = tweet.replace(url, getURLType(url))
     return tweet
 
 def processData(allTweets):
@@ -73,7 +75,7 @@ def processData(allTweets):
 
         tweet = replaceAtUser(tweet)
 
-        # tweet = removeHashtag(tweet)
+        tweet = removeHashtag(tweet)
 
         tweet = tweet.lower()
 
@@ -81,5 +83,6 @@ def processData(allTweets):
 
         cleanTweets.append(tweet)
 
-    return featureSet
+    return cleanTweets
 
+#print processData(testData)
