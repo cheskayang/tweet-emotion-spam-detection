@@ -14,6 +14,12 @@ def countHashtag(tweet):
             hashTagCounter += 1
     return hashTagCounter
 
+def countAtUser(tweet):
+    atUserCounter = 0
+    for word in tweet.split():
+        if word.startswith("@"):
+            atUserCounter += 1
+    return atUserCounter
 
 def ifStartWithHashtag(tweet):
     return tweet[0] == "#"
@@ -44,7 +50,7 @@ def processData(allTweets):
     featureSet = []
     cleanTweets = []
 
-    for tweet in allTweets:
+    for i, tweet in enumerate(allTweets):
 
         features = ''
 
@@ -83,6 +89,8 @@ def processData(allTweets):
 
         cleanTweets.append(tweet)
 
+        print "finished"
+        print i
+
     return cleanTweets
 
-#print processData(testData)

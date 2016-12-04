@@ -85,19 +85,19 @@ def getURLType(url):
                 
         # Get URL type
         if isMedia(targetUrl):
-            return '[MEDIA]'
+            return 'MEDIA'
         elif isShop(targetUrl):
-            return '[SHOP]'
+            return 'SHOP'
         elif isArticle(targetUrl):
-            return '[ARTICLE]'
+            return 'ARTICLE'
         elif isSNS(targetUrl):
-            return '[SNS]' 
+            return 'SNS'
         else:
-            return '[URL]'
+            return 'OTHERS'
         
     else:
         # Invalid URL
-        return '[URL]'
+        return 'OTHERS'
   
 # # Test the algorithm
 # with open('data.csv', 'rb') as f:

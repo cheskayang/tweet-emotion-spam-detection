@@ -71,7 +71,7 @@ if __name__ == "__main__":
             allContent.append(row[2])
             allCodes.append(row[4])
 
-    allContent = processData(allContent)
+    # allContent = processData(allContent)
 
     docs = list(zip(allContent, allCodes))
 
