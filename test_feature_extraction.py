@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import re
 import csv
 from url_classifier import getURLType
@@ -23,6 +25,17 @@ def countAtUser(tweet):
             atUserCounter += 1
     return atUserCounter
 
+def countUrl(tweet):
+    urlCounter = 0
+    for word in tweet.split():
+        if word.startswith("http"):
+            urlCounter += 1
+    return urlCounter
+
+def countHashtagPerWord(tweet):
+    return len(tweet.split()) / countHashtag(tweet)
+
+
 def ifStartWithHashtag(tweet):
     return tweet[0] == "#"
 
@@ -30,6 +43,12 @@ def ifStartWithHashtag(tweet):
 def ifEndWithHashtag(tweet):
     return tweet.split()[-1][0] == "#"
 
+def ifStartWithUrl(tweet):
+    return tweet[0] == "http"
+
+
+def ifEndWithUrl(tweet):
+    return tweet.split()[-1][0] == "http"
 
 def replaceAtUser(tweet):
     tweet = re.sub(r'[@]\S*', '@user', tweet)
@@ -49,9 +68,15 @@ def classifyURL(tweet):
 
     return urlTypes
 
-def processData(allTweets):
 
-    cleanTweets = []
+def ifHasDealFeature(tweet):
+    # dealSigns = ["$", "free", "check out", "deal", "%"]
+    #
+    #
+    if tweet.find("$") != -1 or tweet.find("free") != -1:
+        return True
+
+def processData(allTweets):
 
     for i, tweet in enumerate(allTweets):
 
@@ -59,33 +84,26 @@ def processData(allTweets):
 
         if ifStartWithHashtag(tweet):
             features["hashtagPosition"] = "start"
-            if ifEndWithHashtag(tweet):
-                features["hashtagPosition"] = "startAndEnd"
         elif ifEndWithHashtag(tweet):
             features["hashtagPosition"] = "end"
-        else:
-            features["hashtagPosition"] = "end"
+
+        if ifStartWithUrl(tweet):
+            features["urlPosition"] = "start"
+        elif ifEndWithUrl(tweet):
+            features["urlPosition"] = "end"
 
         features["atUserCount"] = countAtUser(tweet)
 
-        features["urlType"] = classifyURL(tweet)
+        features["urlCount"] = countUrl(tweet)
 
-        counter = countHashtag(tweet)
+        # features["urlType"] = classifyURL(tweet)
 
-        if counter == 0:
-            features["hashtagCount"] = "f0hashtag"
+        features["hashtagCount"] = countHashtag(tweet)
 
-        elif counter > 0 and counter <= 3:
-            features["hashtagCount"] = " f03hashtag"
+        features["hashtagPerWord"] = countHashtagPerWord(tweet)
 
-        elif counter > 3 and counter <= 5:
-            features["hashtagCount"] = " f35hashtag"
-
-        elif counter > 5 and counter <= 7:
-            features["hashtagCount"] = " f57hashtag"
-
-        elif counter > 7:
-            features["hashtagCount"] = " f8hashtag"
+        if ifHasDealFeature(tweet):
+            features["dealLike"] = True
 
         featureSets.append(features)
 
@@ -100,12 +118,12 @@ allContent = []
 allCodes = []
 
 # open the coded tweets csv file
-with open('test-change-6.csv', 'rb') as f:
+with open('change-500.csv', 'rb') as f:
     reader = csv.reader(f, delimiter=',')
     for row in reader:
         # arrange file content in the tuple, push to documents array
         allContent.append(row[2])
-        allCodes.append(row[4])
+        allCodes.append(row[6])
 
 allContent = processData(allContent)
 
@@ -114,6 +132,8 @@ docs = list(zip(allContent, allCodes))
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import BernoulliNB
+
 
 
 vectorizer = DictVectorizer()
@@ -123,6 +143,11 @@ def train_svm(X, y):
     svm = SVC(C=1000, gamma=0.001, kernel='rbf')
     svm.fit(X, y)
     return svm
+
+def train_BNB(X, y):
+    bnb = BernoulliNB()
+    bnb.fit(X_train, y_train)
+    return bnb
 
 def create_tfidf_training_data(document):
 
@@ -142,10 +167,32 @@ X, y = create_tfidf_training_data(docs)
 
 # Create the training-test split of the data
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=42
+    X, y, test_size=0.2, random_state=42
 )
 
 #Create and train the Support Vector Machine
 svm = train_svm(X_train, y_train)
 print("SVM Result:")
 print(svm.score(X_test, y_test))
+
+
+# #naive bayes
+# def most_informative_feature_for_binary_classification(vectorizer, classifier, n=100):
+#     class_labels = classifier.classes_
+#     feature_names = vectorizer.get_feature_names()
+#     topn_class1 = sorted(zip(classifier.coef_[0], feature_names))[:n]
+#     topn_class2 = sorted(zip(classifier.coef_[0], feature_names))[-n:]
+#
+#     for coef, feat in topn_class1:
+#         print class_labels[0], coef, feat
+#
+#     print
+#
+#     for coef, feat in reversed(topn_class2):
+#         print class_labels[1], coef, feat
+#
+# bnb = train_BNB(X_train, y_train)
+# print("nb Result:")
+# print(bnb.score(X_test, y_test))
+
+# most_informative_feature_for_binary_classification(vectorizer, bnb)

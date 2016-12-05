@@ -8,6 +8,10 @@ from sklearn.svm import SVC
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import BernoulliNB
 from processor import processData
+from sklearn.metrics import f1_score
+from sklearn.metrics import precision_score
+import matplotlib.pyplot as plt
+
 
 
 vectorizer = CountVectorizer(binary=True, stop_words='english')
@@ -31,7 +35,7 @@ def create_tfidf_training_data(document):
 #train svm classifier
 def train_svm(X, y):
 
-    svm = SVC(C=1000, gamma=0.001, kernel='rbf')
+    svm = SVC(C=100, gamma=0.0005, kernel='rbf')
     svm.fit(X, y)
     return svm
 
@@ -64,14 +68,14 @@ if __name__ == "__main__":
     allCodes = []
 
     # open the coded tweets csv file
-    with open('test-change-6.csv', 'rb') as f:
+    with open('change-500.csv', 'rb') as f:
         reader = csv.reader(f, delimiter=',')
         for row in reader:
             # arrange file content in the tuple, push to documents array
             allContent.append(row[2])
-            allCodes.append(row[4])
+            allCodes.append(row[6])
 
-    # allContent = processData(allContent)
+    allContent = processData(allContent)
 
     docs = list(zip(allContent, allCodes))
 
@@ -81,14 +85,24 @@ if __name__ == "__main__":
 
     # Create the training-test split of the data
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.3, random_state=42
+        X, y, test_size=0.2, random_state=42
     )
 
     #Create and train the Support Vector Machine
     svm = train_svm(X_train, y_train)
-    print("SVM Result:")
-    print(svm.score(X_test, y_test))
-    # print(confusion_matrix(pred, y_test))
+    pred = svm.predict(X_test)
+    print "SVM Result:"
+    print svm.score(X_test, y_test)
+    print confusion_matrix(pred, y_test)
+    print "true positive:"
+    print precision_score(y_test, pred, labels=None, pos_label="0", average='binary', sample_weight=None)
+    print "F measurement:"
+    print f1_score(y_test, pred, average='macro')
+    print f1_score(y_test, pred, average='micro')
+    print f1_score(y_test, pred, average='weighted')
+
+
+
 
     # bnb = train_BNB(X_train, y_train)
     # print("nb Result:")

@@ -1,10 +1,33 @@
+# -*- coding: utf-8 -*-
+
+
 import re
+import csv
+from nltk.stem.porter import *
 from url_classifier import getURLType
 
-testData = ["CHECK IT OUT http://ebay.to/1E668IW #Anger Inside Out Small #Figure #sales #InsideOut #ebay #shopping",
-            "@realDonaldTrump good you racist pig #angry as hell @Blackman",
-            "IS ME!! @djfitix #Play #music #MAD TOUR",
-            "#Angry #Birds #Stella - #Season 2 Ep.5 #Sneak #Peek - ... http://wp.me/p5wiVg-dnb #Ep5 #Its #Minequot"]
+################test data###################
+
+
+
+docs = []
+allContent = []
+allCodes = []
+
+# open the coded tweets csv file
+with open('change-500.csv', 'rb') as f:
+    reader = csv.reader(f, delimiter=',')
+    for row in reader:
+        # arrange file content in the tuple, push to documents array
+        allContent.append(row[2])
+        allCodes.append(row[6])
+
+docs = list(zip(allContent, allCodes))
+
+
+################test data###################
+
+testData = allContent[:50]
 
 
 def countHashtag(tweet):
@@ -20,6 +43,11 @@ def countAtUser(tweet):
         if word.startswith("@"):
             atUserCounter += 1
     return atUserCounter
+
+def countEmoji(tweet):
+    emojis = re.findall(u'[\U0001f600-\U0001f650]', tweet.decode("utf-16"))
+
+    return emojis
 
 def ifStartWithHashtag(tweet):
     return tweet[0] == "#"
@@ -39,6 +67,11 @@ def removeHashtag(tweet):
 
     return tweet
 
+def cleanUrl(tweet):
+    tweet = re.sub('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', 'URL', tweet)
+
+    return tweet
+
 def replaceUrl(tweet):
     urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', tweet)
     for url in urls:
@@ -54,38 +87,52 @@ def processData(allTweets):
 
         features = ''
 
-        if ifStartWithHashtag(tweet):
-            features += " fstarthashtag"
-        if ifEndWithHashtag(tweet):
-            features += " fendhashtag"
+        # if ifStartWithHashtag(tweet):
+        #     features += " fstarthashtag"
+        # if ifEndWithHashtag(tweet):
+        #     features += " fendhashtag"
+        #
+        # counter = countHashtag(tweet)
+        # if counter == 0:
+        #     features += " f0hashtag"
+        #
+        # elif counter > 0 and counter <= 3:
+        #     features += " f03hashtag"
+        #
+        # elif counter > 3 and counter <= 5:
+        #     features += " f35hashtag"
+        #
+        # elif counter > 5 and counter <= 7:
+        #     features += " f57hashtag"
+        #
+        # elif counter > 7:
+        #     features += " f8hashtag"
 
-        counter = countHashtag(tweet)
-        if counter == 0:
-            features += " f0hashtag"
-
-        elif counter > 0 and counter <= 3:
-            features += " f03hashtag"
-
-        elif counter > 3 and counter <= 5:
-            features += " f35hashtag"
-
-        elif counter > 5 and counter <= 7:
-            features += " f57hashtag"
-
-        elif counter > 7:
-            features += " f8hashtag"
-
-        featureSet.append(features)
-
-        tweet = replaceUrl(tweet)
-
-        tweet = replaceAtUser(tweet)
-
+        # featureSet.append(features)
+        #
+        # # tweet = replaceUrl(tweet)
+        # #
+        # tweet = replaceAtUser(tweet)
+        # #
         tweet = removeHashtag(tweet)
+        # #
+        # tweet = tweet.lower()
+        # #
+        # stemmer = PorterStemmer()
+        #
+        # tweet = tweet.decode("utf8")
+        #
+        # tweetStems = [stemmer.stem(word) for word in tweet.split()]
+        #
+        # tweet = " ".join(tweetStems)
 
-        tweet = tweet.lower()
+        # tweet += features
 
-        tweet += features
+
+
+        tweet = cleanUrl(tweet)
+
+        print countEmoji(tweet)
 
         cleanTweets.append(tweet)
 
@@ -94,3 +141,4 @@ def processData(allTweets):
 
     return cleanTweets
 
+print testData[38]
