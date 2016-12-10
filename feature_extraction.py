@@ -7,16 +7,6 @@ import string
 import nltk
 from nltk.corpus import stopwords
 
-
-allContent = []
-
-with open('change-700.csv', 'r') as f:
-    reader = csv.reader(f, delimiter=',')
-    for row in reader:
-        # arrange file content in the tuple, push to documents array
-        allContent.append(row[2])
-
-
 from sklearn.preprocessing import LabelEncoder
 from url_classifier import getURLType
 from nltk.tokenize import TweetTokenizer
