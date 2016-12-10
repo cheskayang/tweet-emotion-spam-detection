@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
-import urllib.request, urllib.error, urllib.parse
+import urllib2
 import codecs
 import csv
 
@@ -15,7 +15,7 @@ headers = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.
          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'}
 
 # Use to unwrap a shortened URL
-class HeadRequest(urllib.request.Request):
+class HeadRequest(urllib2.Request):
     def get_method(self):
         return "HEAD"
 
@@ -40,12 +40,12 @@ def getURLType(url):
         targetUrl = ""
         if isShortened:
             try:
-                res = urllib.request.urlopen(HeadRequest(url))
+                res = urllib2.urlopen(HeadRequest(url))
                 targetUrl = res.geturl()
             except:
                 try:
                     global headers
-                    res = urllib.request.urlopen(HeadRequest(url, None, headers))
+                    res = urllib2.urlopen(HeadRequest(url, None, headers))
                     targetUrl = res.geturl()
                 except:
                     targetUrl = url

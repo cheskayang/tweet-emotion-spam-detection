@@ -11,6 +11,15 @@ testData = ["CHECK IT OUT http://ebay.to/1E668IW #Anger Inside Out Small #Figure
 
 featureSets = []
 
+def countNumberOfWords(tweet):
+    return len(tweet.split())
+
+def countChars(tweet):
+    return len(tweet) - tweet.count(' ')
+
+def countNumericChars(tweet):
+    return sum(c.isdigit() for c in tweet)
+
 def countHashtag(tweet):
     hashTagCounter = 0
     for word in tweet.split():
@@ -33,8 +42,10 @@ def countUrl(tweet):
     return urlCounter
 
 def countHashtagPerWord(tweet):
-    return len(tweet.split()) / countHashtag(tweet)
+    return countHashtag(tweet) / len(tweet.split())
 
+def countUrlPerWord(tweet):
+    return countUrl(tweet) / len(tweet.split())
 
 def ifStartWithHashtag(tweet):
     return tweet[0] == "#"
@@ -69,6 +80,12 @@ def classifyURL(tweet):
     return urlTypes
 
 
+def cleanUrl(tweet):
+    tweet = re.sub('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', 'URL', tweet)
+
+    return tweet
+
+
 def ifHasDealFeature(tweet):
     # dealSigns = ["$", "free", "check out", "deal", "%"]
     #
@@ -101,6 +118,17 @@ def processData(allTweets):
         features["hashtagCount"] = countHashtag(tweet)
 
         features["hashtagPerWord"] = countHashtagPerWord(tweet)
+
+        features["urlPerWord"] = countUrlPerWord(tweet)
+
+
+        features["numberOfWords"] = countNumberOfWords(tweet)
+
+        # tweet = cleanUrl(tweet)
+
+        features["numberOfNumericChars"] = countNumericChars(tweet)
+
+        features["numberOfChars"] = countChars(tweet)
 
         if ifHasDealFeature(tweet):
             features["dealLike"] = True

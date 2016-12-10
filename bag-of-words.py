@@ -68,14 +68,14 @@ if __name__ == "__main__":
     allCodes = []
 
     # open the coded tweets csv file
-    with open('change-500.csv', 'rb') as f:
+    with open('test-change-6.csv', 'rb') as f:
         reader = csv.reader(f, delimiter=',')
         for row in reader:
             # arrange file content in the tuple, push to documents array
             allContent.append(row[2])
-            allCodes.append(row[6])
+            allCodes.append(row[4])
 
-    allContent = processData(allContent)
+    # allContent = processData(allContent)
 
     docs = list(zip(allContent, allCodes))
 
@@ -93,7 +93,7 @@ if __name__ == "__main__":
     pred = svm.predict(X_test)
     print "SVM Result:"
     print svm.score(X_test, y_test)
-    print confusion_matrix(pred, y_test)
+    print confusion_matrix(pred, y_test, labels=["0", "1"])
     print "true positive:"
     print precision_score(y_test, pred, labels=None, pos_label="0", average='binary', sample_weight=None)
     print "F measurement:"
